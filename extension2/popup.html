@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Blocker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 300px;
+            padding: 10px;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        .cookie-list {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Blocked Cookies</h2>
+    <div class="cookie-list" id="cookieList">
+        <!-- Blocked cookies will be populated here -->
+    </div>
+    <button id="refreshButton">Refresh Blocked Cookies</button>
+
+    <script src="popup.js"></script>
+</body>
+</html>
