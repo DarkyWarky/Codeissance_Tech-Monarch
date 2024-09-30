@@ -47,10 +47,7 @@ async function fetchEmails(accessToken) {
 }
 
 // Enable CORS for requests coming from the frontend (React app running on localhost:5173)
-app.use(cors({
-    origin: 'http://localhost:5173', // React app running on Vite, change port if necessary
-    credentials: true // Allow cookies and credentials to be passed
-}));
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -100,8 +97,9 @@ app.post('/downloads', isAuthenticated, (req, res) => {
 });
 
 // Route to handle periodic data (history, bookmarks, etc.)
-app.post('/routine', isAuthenticated, (req, res) => {
+app.post('/routine' , (req, res) => {
     const routineData = req.body;
+    console.log(`Received ${routineData.routine.data} data:`, routineData.data.history);
     res.json({ status: 'success', message: `${routineData.routine} data received` });
 });
 
