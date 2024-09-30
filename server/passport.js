@@ -14,20 +14,20 @@ module.exports = function(passport) { // This function will receive passport
                 // If you want to log the access token and profile for debugging
                 console.log('Access Token:', accessToken);
                 console.log('Profile:', profile);
-                
                 // Call done with user info, for example:
                 return done(null, { profile, accessToken });
             }
         )
     );
-
+    
     // Serialize user into the session
     passport.serializeUser(function(user, done) {
         done(null, user);
     });
-
+    
     // Deserialize user from the session
     passport.deserializeUser(function(user, done) {
         done(null, user);
     });
 };
+
