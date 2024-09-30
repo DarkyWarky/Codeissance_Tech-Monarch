@@ -1,9 +1,10 @@
 import React from 'react';
 import { useEffect } from 'react';
-import Nav from './components/Nav';
 import gsap from 'gsap';
 
-function Home() {
+
+
+function Landing() {
     useEffect(() => {
         const tl = gsap.timeline();
     
@@ -36,9 +37,8 @@ function Home() {
     
       return (
         <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-          <Nav />
     
-          <main className="container mx-auto pt-20">
+          <main className="container mx-auto p-0">
             {/* Hero Section */}
             <section className="h-screen overflow-hidden shadow-2xl mb-20">
               <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-700 p-8 md:p-12">
@@ -118,4 +118,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Landing;

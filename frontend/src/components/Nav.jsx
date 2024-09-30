@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Home, Search, Bell, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+
+
+const handleGoogleLogin = () => {
+  window.location.href = 'http://localhost:8000/auth/google';
+};
 
 const NavItem = ({ icon: Icon, isActive, link }) => (
   <Link
@@ -15,11 +20,11 @@ const NavItem = ({ icon: Icon, isActive, link }) => (
   </Link>
 );
 
-const Nav = () => {
+const Nav = ({ isAuthenticated, onLogout }) => {
   const location = useLocation();
 
   const navItems = [
-    { id: 'home', icon: Home, link: '/' },
+    { id: 'home', icon: Home, link: '/home' },
     { id: 'search', icon: Search, link: '/search' },
     { id: 'notifications', icon: Bell, link: '/notifications' },
     { id: 'settings', icon: Settings, link: '/settings' },
@@ -31,12 +36,12 @@ const Nav = () => {
   ];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md py-4 px-6 fixed top-0 left-0 right-0 z-10 ">
+    <nav className="bg-white/80 backdrop-blur-md py-4 px-6 fixed top-0 left-0 right-0 z-10">
       <div className="max-w-screen-xl mx-auto flex justify-between items-center">
         {/* Logo */}
-        <div className="text-2xl font-extrabold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+        <Link to="/" className="text-2xl font-extrabold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
           DigiPrints
-        </div>
+        </Link>
 
         {/* Centered left links */}
         <div className="hidden sm:flex space-x-6 items-center">
@@ -55,7 +60,7 @@ const Nav = () => {
 
         {/* Right-side nav items */}
         <div className="flex space-x-4 items-center">
-          {navItems.map((item) => (
+          {isAuthenticated && navItems.map((item) => (
             <NavItem
               key={item.id}
               icon={item.icon}
@@ -64,13 +69,22 @@ const Nav = () => {
             />
           ))}
 
-          {/* Sign Up/Login Button */}
-          <Link
-            to="/login"
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
-          >
-            Sign Up/Login
-          </Link>
+          {/* Login/Logout Button */}
+          {isAuthenticated ? (
+            <button
+              onClick={onLogout}
+              className="bg-red-500 hover:bg-red-600 text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={handleGoogleLogin}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
+            >
+              Login with Google
+            </button>
+          )}
         </div>
       </div>
 
