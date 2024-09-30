@@ -6,6 +6,7 @@ const session = require('express-session');
 const app = express();
 const port = 8000;
 const { google } = require('googleapis'); // Ensure this line is present
+const axios = require('axios');
 require('./passport')(passport); // Pass passport to the require function
 
 
@@ -95,4 +96,26 @@ app.post('/routine', (req, res) => {
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on http://127.0.0.1:${port}`);
+});
+
+app.get('/checkleak', (req, res) => {
+    const userEmail = req.user.profile.emails[0].value;  // Get email from query parameter
+    
+    if (!userEmail) {
+        return res.status(400).send('Email is required');
+    }
+
+    // LeakCheck API URL with the email
+    const apiUrl = `https://leakcheck.io/api/public?check=${userEmail}`;
+
+    // Make the request to the LeakCheck API
+    axios.get(apiUrl)
+        .then(response => {
+            // Send the response back to the user
+            res.json(response.data);
+        })
+        .catch(error => {
+            console.error('Error making API request:', error);
+            res.status(500).send('Error checking the leak status');
+        });
 });
