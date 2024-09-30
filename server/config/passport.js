@@ -17,6 +17,7 @@ module.exports = function(passport) {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 };
+                console.log("User authenticated:", user);
                 done(null, user);
             }
         )

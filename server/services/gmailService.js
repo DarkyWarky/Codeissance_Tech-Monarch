@@ -8,7 +8,7 @@ async function fetchEmails(accessToken, labelIds = ['INBOX']) {
     try {
         const result = await gmail.users.messages.list({
             userId: 'me',
-            maxResults: 1000,
+            maxResults: 100,
             labelIds: labelIds
         });
 
@@ -43,4 +43,4 @@ async function fetchSpamEmails(accessToken) {
     return fetchEmails(accessToken, ['SPAM']);
 }
 
-module.exports = { fetchInboxEmails, fetchSpamEmails };
+module.exports = { fetchInboxEmails, fetchSpamEmails,fetchEmails };

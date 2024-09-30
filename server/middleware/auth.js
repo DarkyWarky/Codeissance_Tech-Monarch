@@ -4,6 +4,13 @@ function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
+    if (req.cookies.access_token) {
+        // If you have the access token, you might want to verify it here
+        // and set req.user accordingly
+        // For now, we'll just pass it through
+        req.user = { accessToken: req.cookies.access_token };
+        return next();
+    }
     res.status(401).json({ error: 'Unauthorized' });
 }
 

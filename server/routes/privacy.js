@@ -3,14 +3,14 @@ const router = express.Router();
 const { isAuthenticated } = require('../middleware/auth');
 const axios = require('axios');
 
-router.get('/checkleak', isAuthenticated, (req, res) => {
-    const userEmail = req.user.profile.emails[0].value;
-
-    if (!userEmail) {
+router.post('/checkleak', isAuthenticated, (req, res) => {
+    const { email } = req.body;
+    
+    if (!email) {
         return res.status(400).json({ error: 'Email is required' });
     }
 
-    const apiUrl = `https://leakcheck.io/api/public?check=${userEmail}`;
+    const apiUrl = `https://leakcheck.io/api/public?check=${email}`;
 
     axios.get(apiUrl)
         .then(response => {
