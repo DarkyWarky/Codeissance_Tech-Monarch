@@ -25,9 +25,7 @@ const Nav = ({ isAuthenticated, onLogout }) => {
 
   const navItems = [
     { id: 'home', icon: Home, link: '/home' },
-    { id: 'search', icon: Search, link: '/search' },
-    { id: 'notifications', icon: Bell, link: '/notifications' },
-    { id: 'settings', icon: Settings, link: '/settings' },
+
   ];
 
   const leftLinks = [
@@ -44,7 +42,7 @@ const Nav = ({ isAuthenticated, onLogout }) => {
         </Link>
 
         {/* Centered left links */}
-        <div className="hidden sm:flex space-x-6 items-center">
+        <div className="hidden sm:flex space-x-6 ">
           {leftLinks.map((link) => (
             <Link
               key={link.id}
@@ -80,7 +78,7 @@ const Nav = ({ isAuthenticated, onLogout }) => {
           ) : (
             <button
               onClick={handleGoogleLogin}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
+              className="bg-purple-700  hover:bg-indigo-500  text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
             >
               Login with Google
             </button>

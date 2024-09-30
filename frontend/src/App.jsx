@@ -25,9 +25,6 @@ function ProtectedRoute({ children }) {
 function AppContent() {
   const { isAuthenticated, isLoading, logout } = useAuth();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>
