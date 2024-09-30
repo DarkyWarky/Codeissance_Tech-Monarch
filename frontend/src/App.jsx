@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Transparency from './pages/Transparency';
 import FAQs from './pages/FAQs';
 import Landing from './pages/Landing';
+import Emails from './pages/Emails';  // Import the Emails component
 import useAuth from './hooks/useAuth';
 
 function ProtectedRoute({ children }) {
@@ -25,6 +26,9 @@ function ProtectedRoute({ children }) {
 function AppContent() {
   const { isAuthenticated, isLoading, logout } = useAuth();
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
@@ -39,6 +43,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/emails" 
+            element={
+              <ProtectedRoute>
+                <Emails />
               </ProtectedRoute>
             } 
           />
