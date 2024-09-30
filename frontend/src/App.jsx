@@ -10,7 +10,7 @@ function App() {
   return (
     <>
     <Nav />
-    <div className="">
+    <div className=" flex items-center justify-center h-screen w-full text-cyan-700">
       <h1>Welcome to My App</h1>
       <button onClick={handleLogin}>Login with Google</button>
     </div>

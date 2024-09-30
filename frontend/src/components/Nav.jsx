@@ -31,7 +31,7 @@ const Nav = () => {
   ];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-lg py-4 px-6 relative top-0 left-0 right-0 z-10 ">
+    <nav className="bg-white/80 backdrop-blur-md py-4 px-6 fixed top-0 left-0 right-0 z-10 ">
       <div className="max-w-screen-xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <div className="text-2xl font-extrabold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">

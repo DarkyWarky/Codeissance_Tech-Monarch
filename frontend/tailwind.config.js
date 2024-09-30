@@ -22,8 +22,8 @@ module.exports = {
         shadow: 'rgba(0, 0, 0, 0.5)',
       },
       fontFamily: {
-        
-      }
+        heading: ['"Playfair Display"','serif']
+      } 
     },
   },
   plugins: [],
