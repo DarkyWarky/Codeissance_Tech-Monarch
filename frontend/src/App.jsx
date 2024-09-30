@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import Nav from './components/Nav';
 import Home from './pages/Home';
 import Transparency from './pages/Transparency';
-import FAQs from './pages/FAQs';
+import FAQ from './pages/FAQ';
 import Landing from './pages/Landing';
 import Emails from './pages/Emails';  // Import the Emails component
 import useAuth from './hooks/useAuth';
@@ -37,7 +37,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/transparency" element={<Transparency />} />
-          <Route path="/faqs" element={<FAQs />} />
+          <Route path="/faqs" element={<FAQ />} />
           <Route 
             path="/home" 
             element={
