@@ -8,6 +8,7 @@ const port = 8000;
 const { google } = require('googleapis');
 const axios = require('axios');
 require('./passport')(passport); // Pass passport to the require function
+const cookieParser = require('cookie-parser');
 
 async function fetchEmails(accessToken) {
     const oauth2Client = new google.auth.OAuth2();
@@ -47,68 +48,91 @@ async function fetchEmails(accessToken) {
 }
 
 // Enable CORS for requests coming from the frontend (React app running on localhost:5173)
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Your React app's URL
+    credentials: true
+}));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 
 // Session middleware to store user session data
-app.use(session({ secret: 'S3cureR@nd0mString!2024', resave: false, saveUninitialized: true }));
+app.use(session({
+    secret: 'S3cureR@nd0mString!2024',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
 
 // Initialize passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Route for Google OAuth authentication
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email', 'https://www.googleapis.com/auth/gmail.readonly'] }));
-
-// Google OAuth callback route
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), async (req, res) => {
-    try {
-        // Successful authentication, redirect to React frontend home page
-        res.redirect('http://localhost:5173/home');
-    } catch (error) {
-        console.error('Error during authentication callback:', error);
-        res.status(500).json({ error: 'Authentication failed' });
-    }
-});
 
 // Middleware to check if the user is authenticated
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    res.status(401).send('Unauthorized');
+    res.status(401).json({ error: 'Unauthorized' });
 }
 
+// Route for Google OAuth authentication
+app.get('/auth/google', passport.authenticate('google', { 
+    scope: ['profile', 'email', 'https://www.googleapis.com/auth/gmail.readonly'],
+    prompt: 'select_account'
+}));
+
+// Google OAuth callback route
+app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/' }),
+    (req, res) => {
+        // User is authenticated, redirect to home
+        res.redirect('http://localhost:5173/home');
+    }
+);
+
+// Logout route
+app.get('/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error logging out' });
+        }
+        res.redirect('http://localhost:5173');
+    });
+});
+
 // Protected route to get the authenticated user's profile
-app.get('/profile', isAuthenticated, (req, res) => {
-    res.json(req.user); // Send the authenticated user's profile information
+app.get('/api/profile', isAuthenticated, (req, res) => {
+    res.json(req.user);
 });
 
 // Route to fetch Gmail inbox emails (this should only work for authenticated users)
 app.use(gmailRoutes);
 
 // Route to handle download data (Example route for other tasks)
-app.post('/downloads', isAuthenticated, (req, res) => {
+app.post('/api/downloads', isAuthenticated, (req, res) => {
     const downloadData = req.body;
     console.log('Received download data:', downloadData);
     res.json({ status: 'success', message: 'Download data received' });
 });
 
 // Route to handle periodic data (history, bookmarks, etc.)
-app.post('/routine' , (req, res) => {
+app.post('/api/routine', isAuthenticated, (req, res) => {
     const routineData = req.body;
-    console.log(`Received ${routineData.routine.data} data:`, routineData.data.history);
+    console.log(`Received ${routineData.routine} data:`, routineData.data);
     res.json({ status: 'success', message: `${routineData.routine} data received` });
 });
 
 // Example route to check for email data breach using LeakCheck API
-app.get('/checkleak', isAuthenticated, (req, res) => {
+app.get('/api/checkleak', isAuthenticated, (req, res) => {
     const userEmail = req.user.profile.emails[0].value; // Get email from authenticated user's profile
 
     if (!userEmail) {
-        return res.status(400).send('Email is required');
+        return res.status(400).json({ error: 'Email is required' });
     }
 
     // LeakCheck API URL with the email
@@ -122,15 +146,16 @@ app.get('/checkleak', isAuthenticated, (req, res) => {
         })
         .catch(error => {
             console.error('Error making API request:', error);
-            res.status(500).send('Error checking the leak status');
+            res.status(500).json({ error: 'Error checking the leak status' });
         });
 });
 
 // Route to fetch Gmail inbox emails
-app.get('/fetch-emails', isAuthenticated, async (req, res) => {
+app.get('/api/fetch-emails', isAuthenticated, async (req, res) => {
     try {
         // Pass the authenticated user's access token to fetch emails
         const emails = await fetchEmails(req.user.accessToken);
+        console.log(emails);
         res.json(emails);
     } catch (error) {
         console.error('Error fetching emails:', error);
@@ -138,6 +163,25 @@ app.get('/fetch-emails', isAuthenticated, async (req, res) => {
     }
 });
 
+// Update the logout route
+app.post('/api/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error logging out' });
+        }
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session:', err);
+            }
+            // Clear all cookies
+            res.clearCookie('connect.sid'); // Clear the session cookie
+            for (const cookie in req.cookies) {
+                res.clearCookie(cookie);
+            }
+            res.json({ success: true });
+        });
+    });
+});
 
 // Start the server
 app.listen(port, () => {
