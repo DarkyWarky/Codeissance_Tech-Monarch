@@ -1,4 +1,4 @@
-const SERVER_URL = 'http://localhost:3000/api';
+const SERVER_URL = 'http://localhost:8000/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     setupTabListeners();
@@ -67,7 +67,7 @@ function fetchData(endpoint) {
 }
 
 function loadCookieRules() {
-    fetchData('cookieRules')
+    fetchData('user/cookieRules')
         .then(data => {
             const cookieRulesDiv = document.getElementById('cookie-rules');
             cookieRulesDiv.innerHTML = '';
@@ -89,7 +89,7 @@ function loadCookieRules() {
 }
 
 function updateCookieRule(domain, blockAll) {
-    fetch(`${SERVER_URL}/cookieRules`, {
+    fetch(`${SERVER_URL}/user/cookieRules`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [domain]: { blockAll } })

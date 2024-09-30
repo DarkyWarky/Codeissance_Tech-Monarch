@@ -85,48 +85,27 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 });
 
 function routineData(data, routine) {
-    if (routine === 'periodicHistory') {
-        fetch('http://127.0.0.1:8000/routine/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'data': data,
-                'routine': routine
-            })
+    fetch('http://127.0.0.1:8000/api/user/routine', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'data': data,
+            'routine': routine
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Successfully sent user history to server:', data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-    else if (routine === 'periodicBookmarks') {
-        fetch('http://127.0.0.1:8000/routine/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'data': data,
-                'routine': routine
-            })
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(`Successfully sent user ${routine} data to server:`, data);
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Successfully sent user bookmark data to server:', data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
 function userDownloads(data) {
-    fetch('http://127.0.0.1:8000/downloads/', {
+    fetch('http://127.0.0.1:8000/api/user/downloads', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -136,10 +115,8 @@ function userDownloads(data) {
         .then(response => response.json())  
         .then(data => {
             console.log('Successfully sent user download data to server:', data);
-        }
-    )
+        })
         .catch(error => {
             console.error('Error:', error);
-        }
-    );  
+        });
 }

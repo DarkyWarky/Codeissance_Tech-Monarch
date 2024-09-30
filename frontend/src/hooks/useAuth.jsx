@@ -8,11 +8,12 @@ const useAuth = () => {
 
   const checkAuthStatus = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/profile', {
+      const response = await fetch('http://localhost:8000/auth/check', {
         credentials: 'include'
       });
       if (response.ok) {
-        setIsAuthenticated(true);
+        const data = await response.json();
+        setIsAuthenticated(data.isAuthenticated);
       } else {
         setIsAuthenticated(false);
       }
@@ -30,7 +31,7 @@ const useAuth = () => {
 
   const logout = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/logout', {
+      const response = await fetch('http://localhost:8000/auth/logout', {
         method: 'POST',
         credentials: 'include'
       });

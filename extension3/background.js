@@ -1,4 +1,4 @@
-const SERVER_URL = 'http://localhost:3000/api';  // Make sure this matches your server's port
+const SERVER_URL = 'http://localhost:8000/api';  // Updated to match your server port
 
 // Initialize storage and set up listeners
 chrome.runtime.onInstalled.addListener(() => {
@@ -57,7 +57,7 @@ chrome.cookies.onChanged.addListener((changeInfo) => {
 });
 
 function sendBlockedCookieToServer(cookie, domain) {
-  fetch(`${SERVER_URL}/blockedCookies`, {
+  fetch(`${SERVER_URL}/user/blockedCookies`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ cookie, domain })
