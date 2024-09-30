@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+    "name": "Privacy Guardian",
+    "version": "1.0",
+    "description": "Comprehensive privacy protection for your browser",
+    "permissions": [
+      "storage",
+      "tabs",
+      "activeTab",
+      "webRequest",
+      "webRequestBlocking",
+      "<all_urls>",
+      "history",
+      "cookies",
+      "geolocation",
+      "notifications",
+      "microphone",
+      "camera"
+    ],
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": true
+    },
+    "browser_action": {
+      "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.js"]
+        }
+    ]
+}
