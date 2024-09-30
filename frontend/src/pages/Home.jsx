@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
+import { db } from '../firebase/config';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Home = () => {
   const { isLoading, isAuthenticated, checkAuthStatus } = useAuth();
@@ -17,6 +19,9 @@ const Home = () => {
           const data = await response.json();
           setProfile(data);
           setProfileError(null);
+          
+          // Store user information in Firestore
+          await storeUserInFirestore(data);
         } else if (response.status === 401) {
           console.log('User not authenticated, rechecking auth status');
           await checkAuthStatus();
@@ -34,6 +39,20 @@ const Home = () => {
       fetchProfile();
     }
   }, [isAuthenticated, checkAuthStatus]);
+
+  const storeUserInFirestore = async (userData) => {
+    try {
+      const { fullUser } = userData;
+      const userRef = doc(db, 'users', fullUser.googleId);
+      await setDoc(userRef, {
+        email: fullUser.email,
+        username: fullUser.displayName,
+      }, { merge: true });
+      console.log('User information stored in Firestore');
+    } catch (error) {
+      console.error('Error storing user information in Firestore:', error);
+    }
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
