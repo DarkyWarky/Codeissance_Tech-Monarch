@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "dataExtractor",
+    "version": "1.0",
+    "permissions": [
+        "tabs",
+        "history",
+        "browsingData",
+        "bookmarks",
+        "identity.email",
+        "identity",
+        "alarms",
+        "downloads"
+    ],
+    "oauth2": {
+        "client_id": "762108892863-ag22uus524n9f6msbeir0ke9hiniib0b.apps.googleusercontent.com",
+        "scopes": ["profile", "email"]
+    },
+
+
+   "background": {
+    "service_worker": "background.js"
+  },
+    "action": {
+        "default_popup": "popup.html"
+    }
+}
