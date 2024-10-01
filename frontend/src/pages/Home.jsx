@@ -31,7 +31,7 @@ const Home = () => {
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
-        setProfileError(`Error fetching profile: ${error.message}`);
+        setProfileError( `Error fetching profile: ${error.message}`);
       }
     };
 
@@ -59,18 +59,18 @@ const Home = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Welcome to Home</h1>
+    <div className="container mx-auto px-4 py-8 bg-violet-600">
       {isAuthenticated ? (
         profile ? (
-          <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <div className="bg-white shadow-md rounded-2xl px-8 pt-6 pb-8 mb-4 animate-fadeIn transition duration-700 ease-in-out transform ">
+
             <h2 className="text-2xl font-semibold mb-4">User Profile</h2>
-            <p className="mb-2"><strong>Username:</strong> {profile.username || 'N/A'}</p>
-            <p className="mb-2"><strong>Email:</strong> {profile.email || 'N/A'}</p>
-            <p className="mb-2"><strong>Access Token:</strong> {profile.accessToken ? 'Present' : 'Not available'}</p>
+            <p className="mb-2 text-1xl "><strong>Username:</strong> {profile.username || 'N/A'}</p>
+            <p className="mb-2 text-1xl"><strong>Email:</strong> {profile.email || 'N/A'}</p>
+            <p className="mb-2 text-1xl"><strong>Access Token:</strong> {profile.accessToken ? 'Present' : 'Not available'}</p>
             <div className="mt-4">
               <h3 className="text-xl font-semibold mb-2">Raw Profile Data:</h3>
-              <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
+              <pre className="bg-black text-white p-4 rounded overflow-x-auto">
                 {JSON.stringify(profile, null, 2)}
               </pre>
             </div>

@@ -6,7 +6,9 @@ import Transparency from './pages/Transparency';
 import FAQ from './pages/FAQ';
 import Landing from './pages/Landing';
 import Emails from './pages/Emails';  // Import the Emails component
-import Alias from './pages/Alias'; // Import the Alias component
+import Extensions from './pages/Extensions';
+// Import the Alias component
+import AliasManagement from './pages/Alias';
 import useAuth from './hooks/useAuth';
 
 function ProtectedRoute({ children }) {
@@ -59,7 +61,15 @@ function AppContent() {
             path="/alias" 
             element={
               <ProtectedRoute>
-                <Alias />
+                <AliasManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/extensions" 
+            element={
+              <ProtectedRoute>
+                <Extensions />
               </ProtectedRoute>
             } 
           />

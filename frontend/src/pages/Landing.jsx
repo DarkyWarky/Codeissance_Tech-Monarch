@@ -35,13 +35,15 @@ function Landing() {
           }, "-=0.5"); // Delay overlap for smooth effect
       }, []);
     
+      
+
       return (
         <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
     
           <main className="container mx-auto p-0">
             {/* Hero Section */}
             <section className="h-screen overflow-hidden shadow-2xl ">
-              <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-700 p-8 md:p-12">
+              <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-700 p-8 ">
                 <div className="flex flex-col md:flex-row items-center justify-center text-center">
                   <div className="md:w-3/6 m-24 mb-8 md:mb-0">
                     <h1 className="hero-text font-heading text-white font-bold text-4xl md:text-5xl lg:text-8xl mb-6 leading-tight">

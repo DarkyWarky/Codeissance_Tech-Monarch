@@ -119,17 +119,17 @@ function AliasManagement() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">All Users</h2>
-      <ul>
+    <div className="container mx-auto p-4 bg-gradient-to-br from-violet-600 to-indigo-700 min-h-screen">
+      <h2 className="text-4xl font-heading font-bold  mb-6 text-center text-white">All Users</h2>
+      <ul className="space-y-4">
         {allUsers.map((userData) => (
-          <li key={userData.id} className="mb-4 p-4 border rounded">
-            <p><strong>User ID:</strong> {userData.id}</p>
+          <li key={userData.id} className="mb-4 p-6 border bg-gradient-to-br from-purple-100 to-indigo-200 rounded-lg shadow-md text-indigo-900 hover:from-purple-200 hover:to-indigo-300 transition-all duration-300">
+            <p className="font-semibold"><strong>User ID:</strong> {userData.id}</p>
             <p><strong>Email:</strong> {userData.email || 'N/A'}</p>
             <p><strong>Username:</strong> {userData.username || 'N/A'}</p>
             <p><strong>Alias:</strong> {userData.alias || 'None'}</p>
             <p><strong>Responders:</strong></p>
-            <ul className="ml-4">
+            <ul className="ml-4 text-indigo-800">
               {userData.responders && userData.responders.map((responder, index) => (
                 <li key={index} className="mb-1">{responder}</li>
               ))}
@@ -137,35 +137,37 @@ function AliasManagement() {
             {userData.credentialRequest && (
               <p><strong>Credential Request:</strong> {userData.credentialRequest.status}</p>
             )}
-            {userData.email && userData.id !== currentUserProfile?.fullUser.googleId && (
-              <button
-                onClick={() => addUserAsAlias(userData.id, userData.email)}
-                className="mt-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-2"
-              >
-                Add as Alias
-              </button>
-            )}
-            {userData.responders && userData.responders.includes(currentUserProfile?.fullUser.email) && !userData.credentialRequest && (
-              <button
-                onClick={() => requestCredentials(userData.id)}
-                className="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 mr-2"
-              >
-                Request Credentials
-              </button>
-            )}
-            {userData.alias === currentUserProfile?.fullUser.email && userData.credentialRequest && userData.credentialRequest.status === 'pending' && (
-              <button
-                onClick={() => rejectCredentialRequest(userData.id)}
-                className="mt-2 bg-red-500 text-white p-2 rounded hover:bg-red-600"
-              >
-                Reject Credential Request
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+            <div className="mt-4 space-x-2">
+              {userData.email && userData.id !== currentUserProfile?.fullUser.googleId && (
+                <button
+                  onClick={() => addUserAsAlias(userData.id, userData.email)}
+                  className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
+                  Add as Alias
+                </button>
+              )}
+              {userData.responders && userData.responders.includes(currentUserProfile?.fullUser.email) && !userData.credentialRequest && (
+                <button
+                  onClick={() => requestCredentials(userData.id)}
+                  className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
+                  Request Credentials
+                </button>
+)}
+{userData.credentialRequest && userData.credentialRequest.status === 'pending' && (
+  <button
+    onClick={() => rejectCredentialRequest(userData.id)}
+    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+  >
+    Reject Credential Request
+  </button>
+)}
+</div>
+</li>
+))}
+</ul>
+</div>
+);
 }
 
 export default AliasManagement;
