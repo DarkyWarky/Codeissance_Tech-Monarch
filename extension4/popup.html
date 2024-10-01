@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Valid Password Generator</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+    h2 {
+      color: #333;
+      text-align: center;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #password {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      word-break: break-all;
+      text-align: center;
+      font-size: 16px;
+    }
+    #copy {
+      display: none;
+      margin-top: 10px;
+      background-color: #008CBA;
+    }
+    #copy:hover {
+      background-color: #007B9A;
+    }
+  </style>
+</head>
+<body>
+  <h2>Valid Password Generator</h2>
+  <button id="generate">Generate Password</button>
+  <div id="password"></div>
+  <button id="copy">Copy</button>
+  <script src="popup.js"></script>
+</body>
+</html>

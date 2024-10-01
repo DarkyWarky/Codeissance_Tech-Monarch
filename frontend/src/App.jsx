@@ -9,6 +9,7 @@ import Emails from './pages/Emails';  // Import the Emails component
 import Extensions from './pages/Extensions';
 // Import the Alias component
 import AliasManagement from './pages/Alias';
+import PasswordManager from './pages/passwordManager'; // Import the PasswordManager component
 import useAuth from './hooks/useAuth';
 
 function ProtectedRoute({ children }) {
@@ -70,6 +71,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Extensions />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/password-manager" 
+            element={
+              <ProtectedRoute>
+                <PasswordManager />
               </ProtectedRoute>
             } 
           />

@@ -1,16 +1,28 @@
 const passport = require('passport');
 
 function isAuthenticated(req, res, next) {
+    console.log('Checking authentication...');
+    console.log('req.isAuthenticated():', req.isAuthenticated());
+    console.log('req.user:', req.user);
+    console.log('req.cookies:', req.cookies);
+
     if (req.isAuthenticated()) {
+        console.log('User is authenticated via session');
         return next();
     }
-    if (req.cookies.access_token) {
-        // If you have the access token, you might want to verify it here
-        // and set req.user accordingly
-        // For now, we'll just pass it through
-        req.user = { accessToken: req.cookies.access_token };
+    if (req.cookies && req.cookies.access_token) {
+        console.log('Access token found in cookies');
+        // Here you should verify the access token
+        // For now, we'll assume it's valid if it exists
+        req.user = { 
+            accessToken: req.cookies.access_token,
+            googleId: req.cookies.user_id,
+            email: req.cookies.user_email,
+            displayName: req.cookies.user_name
+        };
         return next();
     }
+    console.log('User is not authenticated');
     res.status(401).json({ error: 'Unauthorized' });
 }
 
@@ -27,6 +39,11 @@ function handleGoogleCallback(req, res, next) {
         if (err) {
             return next(err);
         }
+        // Set cookies here
+        res.cookie('access_token', req.user.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+        res.cookie('user_id', req.user.googleId, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+        res.cookie('user_email', req.user.email, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+        res.cookie('user_name', req.user.displayName, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
         res.redirect('http://localhost:5173/home');
     });
 }
