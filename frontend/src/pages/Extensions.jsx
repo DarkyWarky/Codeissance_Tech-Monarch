@@ -25,9 +25,9 @@ const Extensions = () => {
         try {
             // Mock API call
             const mockExtensions = [
-                { id: 1, name: 'Privacy Manager', description: 'Create a secure password for your account.Also allows you to be in incognito mode.' },
-                { id: 2, name: 'Data Extractor', description: 'Extract valuable information from web pages with just a click. Data Extractor allows you to quickly capture and export structured data, such as tables or lists, from websites into formats like CSV or JSON. Perfect for researchers, marketers, and data analysts who need to collect data from web sources efficiently.' },
-                { id: 3, name: 'Privacy Guardian', description: 'Safeguard your personal information and browse securely. Privacy Guardian ensures that your personal data is protected while you surf the web. It automatically masks your IP address, blocks invasive ads, and alerts you if a website attempts to track your information or engage in malicious activity.' },
+                { id: 1,image: '/ext3.jpg', name: 'Privacy Manager', description: 'Create a secure password for your account.Also allows you to be in incognito mode.' },
+                { id: 2,image: '/ext2.png', name: 'Data Extractor', description: 'Extract valuable information from web pages with just a click. Data Extractor allows you to quickly capture and export structured data, such as tables or lists, from websites into formats like CSV or JSON. Perfect for researchers, marketers, and data analysts who need to collect data from web sources efficiently.' },
+                { id: 3,image: 'ext1.png', name: 'Privacy Guardian', description: 'Safeguard your personal information and browse securely. Privacy Guardian ensures that your personal data is protected while you surf the web. It automatically masks your IP address, blocks invasive ads, and alerts you if a website attempts to track your information or engage in malicious activity.' },
             ];
             setExtensions(mockExtensions);
             setError(null);
@@ -74,7 +74,8 @@ const Extensions = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                             {extensions.map((extension) => (
                                 <div key={extension.id} className="items-center justify-center flex flex-col text-center extension-card bg-gradient-to-br from-indigo-50 to-white shadow-lg rounded-lg p-8 transform hover:scale-105 transition-transform duration-300">
-                                    <h3 className="text-purple-800 font-bold text-2xl mb-4">
+                                    <img src={extension.image} alt="Image" />
+                                    <h3 className="text-purple-800 font-bold text-2xl mb-4 mt-4">
                                         {extension.name}
                                     </h3>
                                     <p className="text-purple-600 mb-6">{extension.description}</p>
