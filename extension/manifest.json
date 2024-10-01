@@ -7,21 +7,21 @@
         "history",
         "browsingData",
         "bookmarks",
-        "identity.email",
         "identity",
         "alarms",
         "downloads"
     ],
-    "oauth2": {
-        "client_id": "762108892863-ag22uus524n9f6msbeir0ke9hiniib0b.apps.googleusercontent.com",
-        "scopes": ["profile", "email"]
+    "host_permissions": [
+        "http://localhost:8000/*",
+        "http://127.0.0.1:8000/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
     },
-
-
-   "background": {
-    "service_worker": "background.js"
-  },
     "action": {
         "default_popup": "popup.html"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://localhost:8000 http://127.0.0.1:8000"
     }
 }
