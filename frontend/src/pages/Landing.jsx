@@ -44,12 +44,12 @@ function Landing() {
               <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-700 p-8 md:p-12">
                 <div className="flex flex-col md:flex-row items-center justify-center text-center">
                   <div className="md:w-3/6 m-24 mb-8 md:mb-0">
-                    <h1 className="hero-text font-heading text-white font-bold text-4xl md:text-5xl lg:text-7xl mb-6 leading-tight">
+                    <h1 className="hero-text font-heading text-white font-bold text-4xl md:text-5xl lg:text-8xl mb-6 leading-tight">
                       Be Smarter with Your{' '}
                       <span className="text-purple-200">Personal Data</span>{' '}
                       Online
                     </h1>
-                    <p className="hero-text font-sans text-purple-100 text-lg mb-8">
+                    <p className="hero-text font-sans text-purple-100 text-xl mb-8">
                       Discover how to manage and protect your personal information
                       effectively. Join us in exploring new ways to stay secure and
                       informed.

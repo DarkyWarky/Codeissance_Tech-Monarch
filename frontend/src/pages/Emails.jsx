@@ -8,19 +8,20 @@ const LeakResultDisplay = ({ email, leakResult }) => {
     if (!leakResult) return <p>No leak check result available.</p>;
 
     return (
-        <div className="bg-white shadow-md rounded-lg p-6 mt-4">
-            <h3 className="text-xl font-semibold mb-4">Leak Check Result for {email}</h3>
+        
+        <div className=" text-lg bg-gradient-to-br from-indigo-100 to-purple-200 flex flex-col items-center justify-center shadow-md rounded-lg p-6 text-purple-800 font-bold  z-10 h-auto">
+            <h2 className="text-5xl font-heading leading-tight font-semibold mb-4">Data Leaked in a Breach? </h2>
             {leakResult.success ? (
                 <>
-                    <p className="text-lg mb-2">
-                        <span className="font-medium">Status:</span> 
-                        <span className="text-red-600 font-bold ml-2">Leak Found</span>
+                    <p className="text-xl mb-2">
+                        <span className="font-medium text-3xl">Status:</span> 
+                        <span className="text-red-600 text-3xl font-bold ml-2">Leak Found</span>
                     </p>
                     <p className="mb-2">
                         <span className="font-medium">Number of leaks:</span> 
                         <span className="ml-2">{leakResult.found}</span>
                     </p>
-                    <div className="mb-4">
+                    <div className="mb-4 text-left">
                         <p className="font-medium mb-1">Compromised information:</p>
                         <ul className="list-disc list-inside pl-4">
                             {leakResult.fields.map((field, index) => (
@@ -40,7 +41,7 @@ const LeakResultDisplay = ({ email, leakResult }) => {
                     </div>
                 </>
             ) : (
-                <p className="text-lg text-green-600 font-bold">No leaks found</p>
+                <p className="text-3xl text-green-600 font-bold">No leaks found</p>
             )}
         </div>
     );
@@ -239,21 +240,22 @@ const Emails = () => {
     if (error) return <div className="text-center mt-8 text-red-600">Error: {error}</div>;
 
     return (
-        <div className="p-4 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold mb-6 text-center">Categorized Emails</h1>
-            {userProfile && <p className="text-center mb-4">User: {userProfile.email}</p>}
+            <>
+        <div className="p-4 bg-gradient-to-br from-purple-600 to-indigo-700 h-auto pb-20">
+            <h1 className="text-6xl font-heading font-bold leading-tight pt-9 text-white mb-6 text-center">Companies that have Footprints</h1>
+            {userProfile && <p className="text-center text-white/90 mb-4">User: {userProfile.email}</p>}
             
             {emailCategories && emailCategories.categories.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {emailCategories.categories.map((category, index) => (
                         <div 
                             key={index} 
-                            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                            className="bg-white p-6 rounded-md shadow-md min-h-40 hover:shadow-lg transition-shadow cursor-pointer"
                             onClick={() => handleCategoryClick(category)}
                         >
                             <h2 className="text-2xl font-semibold mb-3">{category.name}</h2>
-                            <p className="text-gray-600">Unique Senders: {category.uniqueSenders}</p>
-                            <p className="text-gray-600">Total Emails: {category.senders.reduce((sum, sender) => sum + sender.count, 0)}</p>
+                            <p className="text-black ">Unique Senders: {category.uniqueSenders}</p>
+                            <p className="text-black">Total Emails: {category.senders.reduce((sum, sender) => sum + sender.count, 0)}</p>
                         </div>
                     ))}
                 </div>
@@ -287,11 +289,9 @@ const Emails = () => {
             )}
             
             {/* Updated leak check result display */}
-            <div className="mt-8">
-                <h2 className="text-2xl font-bold mb-4">Email Leak Check Result</h2>
-                <LeakResultDisplay email={userProfile?.email} leakResult={leakResult} />
-            </div>
         </div>
+                <LeakResultDisplay email={userProfile?.email} leakResult={leakResult} />
+    </>
     );
 };
 
