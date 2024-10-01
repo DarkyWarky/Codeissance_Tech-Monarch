@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import useAuth from '../hooks/useAuth';
 import { QRCodeSVG } from 'qrcode.react';
+import { db } from '../firebase/config';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import * as jose from 'jose';
 
 const PasswordManager = () => {
   const { isLoading, isAuthenticated, checkAuthStatus } = useAuth();
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
-  const [passwordData, setPasswordData] = useState(null);
+  const [passwordData, setPasswordData] = useState({});
   const [otpSecret, setOtpSecret] = useState(null);
   const [otp, setOtp] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [revealedPasswords, setRevealedPasswords] = useState({});
   const [showQRCode, setShowQRCode] = useState(false);
 
-  const fetchPasswordsFromServer = useCallback(async () => {
+  const fetchPasswordsFromServer = useCallback(async (googleId) => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/user/password-data', {
         method: 'GET',
@@ -20,8 +23,29 @@ const PasswordManager = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('Passwords fetched from server:', data);
-        setPasswordData(data);
+        console.log('Raw password data from server:', data);
+        
+        // Ensure data is in the correct format
+        const formattedData = {};
+        if (Array.isArray(data)) {
+          data.forEach(item => {
+            if (item.domain && item.password) {
+              formattedData[item.domain] = item.password;
+            }
+          });
+        } else if (typeof data === 'object') {
+          Object.entries(data).forEach(([key, value]) => {
+            if (value.domain && value.password) {
+              formattedData[value.domain] = value.password;
+            } else if (typeof value === 'string') {
+              formattedData[key] = value;
+            }
+          });
+        }
+        
+        console.log('Formatted password data:', formattedData);
+        await encryptAndStorePasswords(googleId, formattedData);
+        await fetchPasswordsFromFirestore(googleId);
       } else {
         console.error('Failed to fetch passwords from server');
       }
@@ -29,6 +53,51 @@ const PasswordManager = () => {
       console.error('Error fetching passwords from server:', error);
     }
   }, []);
+
+
+  const encryptAndStorePasswords = async (googleId, passwords) => {
+    const encryptedPasswords = {};
+    const encoder = new TextEncoder();
+    const secretKey = encoder.encode('your-secret-key');
+
+    for (const [domain, password] of Object.entries(passwords)) {
+      const jwt = await new jose.SignJWT({ password, domain })
+        .setProtectedHeader({ alg: 'HS256' })
+        .sign(secretKey);
+      encryptedPasswords[domain] = jwt;
+    }
+
+    try {
+      const userRef = doc(db, 'users', googleId);
+      await setDoc(userRef, { passwords: encryptedPasswords }, { merge: true });
+      console.log('Encrypted passwords stored in Firestore:', encryptedPasswords);
+    } catch (error) {
+      console.error('Error storing encrypted passwords in Firestore:', error);
+    }
+  };
+
+  const fetchPasswordsFromFirestore = async (googleId) => {
+    try {
+      const userRef = doc(db, 'users', googleId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.passwords) {
+          console.log('Passwords fetched from Firestore:', userData.passwords);
+          setPasswordData(userData.passwords);
+        } else {
+          console.log('No passwords found for this user');
+          setPasswordData({});
+        }
+      } else {
+        console.log('User document not found');
+        setPasswordData({});
+      }
+    } catch (error) {
+      console.error('Error fetching passwords from Firestore:', error);
+      setPasswordData({});
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -44,13 +113,10 @@ const PasswordManager = () => {
           
           if (data.fullUser && data.fullUser.googleId) {
             console.log('Google ID:', data.fullUser.googleId);
-            fetchPasswordsFromServer();
+            await fetchPasswordsFromServer(data.fullUser.googleId);
             if (!otpSecret) {
               generateOTPSecret(data.fullUser.googleId);
             }
-            // Set up interval to fetch passwords every 5 seconds
-            const intervalId = setInterval(fetchPasswordsFromServer, 5000);
-            return () => clearInterval(intervalId);
           }
         } else if (response.status === 401) {
           console.log('User not authenticated, rechecking auth status');
@@ -137,11 +203,20 @@ const PasswordManager = () => {
     return output;
   };
 
-  const handleVerifyOTP = async () => {
+  const handleRevealPassword = async (domain) => {
     if (otpSecret) {
       const generatedOTP = await generateTOTP(otpSecret);
       if (otp === generatedOTP) {
-        setIsPasswordVisible(true);
+        try {
+          const encoder = new TextEncoder();
+          const secretKey = encoder.encode('your-secret-key');
+          const { payload } = await jose.jwtVerify(passwordData[domain], secretKey);
+          console.log('Decrypted payload:', payload);
+          setRevealedPasswords(prev => ({ ...prev, [domain]: payload.password }));
+        } catch (error) {
+          console.error('Error decoding password:', error);
+          alert('Failed to reveal password. Please try again.');
+        }
       } else {
         alert('Invalid OTP. Please try again.');
       }
@@ -176,36 +251,35 @@ const PasswordManager = () => {
                 )}
               </div>
             )}
-            {passwordData && Object.keys(passwordData).length > 0 ? (
+            {Object.keys(passwordData).length > 0 ? (
               <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <h2 className="text-2xl font-semibold mb-4">Stored Passwords</h2>
-                {Object.entries(passwordData).map(([id, entry]) => (
-                  <div key={id} className="mb-4">
-                    <p className="mb-2"><strong>Domain:</strong> {entry.domain}</p>
-                    {isPasswordVisible ? (
-                      <p className="mb-2"><strong>Password:</strong> {entry.password}</p>
-                    ) : (
-                      <p className="mb-2"><strong>Password:</strong> ********</p>
+                {Object.entries(passwordData).map(([domain, encryptedPassword]) => (
+                  <div key={domain} className="mb-4">
+                    <p className="mb-2"><strong>Domain:</strong> {domain}</p>
+                    <p className="mb-2">
+                      <strong>Password:</strong> 
+                      {revealedPasswords[domain] || '********'}
+                    </p>
+                    {!revealedPasswords[domain] && (
+                      <button
+                        onClick={() => handleRevealPassword(domain)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                      >
+                        Reveal Password
+                      </button>
                     )}
                   </div>
                 ))}
-                {!isPasswordVisible && (
-                  <div>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter OTP"
-                      className="mb-2 px-3 py-2 border rounded"
-                    />
-                    <button
-                      onClick={handleVerifyOTP}
-                      className="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                      Verify OTP
-                    </button>
-                  </div>
-                )}
+                <div>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter OTP"
+                    className="mb-2 px-3 py-2 border rounded"
+                  />
+                </div>
               </div>
             ) : (
               <p>No passwords stored. Generate a password using the extension first.</p>
