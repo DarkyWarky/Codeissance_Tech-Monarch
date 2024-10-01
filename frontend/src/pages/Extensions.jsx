@@ -25,7 +25,7 @@ const Extensions = () => {
         try {
             // Mock API call
             const mockExtensions = [
-                { id: 1, name: 'Cookie Blocker', description: 'Block unwanted tracking cookies and enhance your online privacy. The Cookie Blocker extension helps you automatically block third-party cookies and tracking scripts from websites. Protect your browsing activity from being tracked by advertisers and improve your privacy online. Easy to configure and customize for different levels of cookie control.' },
+                { id: 1, name: 'Privacy Manager', description: 'Create a secure password for your account.Also allows you to be in incognito mode.' },
                 { id: 2, name: 'Data Extractor', description: 'Extract valuable information from web pages with just a click. Data Extractor allows you to quickly capture and export structured data, such as tables or lists, from websites into formats like CSV or JSON. Perfect for researchers, marketers, and data analysts who need to collect data from web sources efficiently.' },
                 { id: 3, name: 'Privacy Guardian', description: 'Safeguard your personal information and browse securely. Privacy Guardian ensures that your personal data is protected while you surf the web. It automatically masks your IP address, blocks invasive ads, and alerts you if a website attempts to track your information or engage in malicious activity.' },
             ];

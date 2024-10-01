@@ -77,9 +77,22 @@ const Emails = () => {
 
             setUserProfile(profile);
 
-            if (profile && profile.fullUser && profile.fullUser.accessToken) {
+            // Check if the profile has the necessary data
+            if (profile && profile.accessToken) {
+                await fetchAndProcessEmails(profile.accessToken, profile.googleId);
+                if (profile.email) {
+                    await checkEmailLeak(profile.email);
+                } else {
+                    console.warn('User email not available for leak check');
+                }
+            } else if (profile && profile.fullUser && profile.fullUser.accessToken) {
+                // If the data is nested under fullUser
                 await fetchAndProcessEmails(profile.fullUser.accessToken, profile.fullUser.googleId);
-                await checkEmailLeak(profile.email);
+                if (profile.fullUser.email) {
+                    await checkEmailLeak(profile.fullUser.email);
+                } else {
+                    console.warn('User email not available for leak check');
+                }
             } else {
                 throw new Error('Invalid user profile data or missing access token');
             }
@@ -416,7 +429,7 @@ const Emails = () => {
 
             {/* Updated leak check result display */}
         </div>
-                <LeakResultDisplay email={userProfile?.email} leakResult={leakResult} />
+                <LeakResultDisplay email={userProfile?.email || userProfile?.fullUser?.email} leakResult={leakResult} />
     </>
     );
 };
