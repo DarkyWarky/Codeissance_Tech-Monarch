@@ -7,6 +7,7 @@ const Home = () => {
   const { isLoading, isAuthenticated, checkAuthStatus } = useAuth();
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
+  const [ipData, setIpData] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -20,7 +21,6 @@ const Home = () => {
           setProfile(data);
           setProfileError(null);
           
-          // Store user information in Firestore
           await storeUserInFirestore(data);
         } else if (response.status === 401) {
           console.log('User not authenticated, rechecking auth status');
@@ -31,12 +31,27 @@ const Home = () => {
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
-        setProfileError( `Error fetching profile: ${error.message}`);
+        setProfileError(`Error fetching profile: ${error.message}`);
+      }
+    };
+
+    const fetchIpData = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        if (response.ok) {
+          const data = await response.json();
+          setIpData(data);
+        } else {
+          console.error('Failed to fetch IP data');
+        }
+      } catch (error) {
+        console.error('Error fetching IP data:', error);
       }
     };
 
     if (isAuthenticated) {
       fetchProfile();
+      fetchIpData();
     }
   }, [isAuthenticated, checkAuthStatus]);
 
@@ -71,7 +86,7 @@ const Home = () => {
             <div className="mt-4">
               <h3 className="text-xl font-semibold mb-2">Raw Profile Data:</h3>
               <pre className="bg-black text-white p-4 rounded overflow-x-auto">
-                {JSON.stringify(profile, null, 2)}
+                {JSON.stringify(ipData, null, 2)}
               </pre>
             </div>
           </div>
