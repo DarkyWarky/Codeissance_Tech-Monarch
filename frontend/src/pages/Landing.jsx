@@ -133,9 +133,9 @@ function Landing() {
               </div>
               <div className="md:w-1/2">
                 <img 
-                  src="https://th.bing.com/th/id/OIP.Jo1lWrbHUewQHxCfLH6bZQHaE8?rs=1&pid=ImgDetMain" 
+                  src="/hero5.jpg" 
                   alt="Stay Informed" 
-                  className="rounded-lg shadow-2xl w-full h-auto max-w-md mx-auto hover:scale-105 transition duration-300 ease-in-out"
+                  className="rounded-lg  w-full h-auto max-w-md mx-auto hover:scale-105 transition duration-300 ease-in-out"
                 />  
                 
               </div>
