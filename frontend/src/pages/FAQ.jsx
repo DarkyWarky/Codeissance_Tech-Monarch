@@ -3,11 +3,11 @@ import Nav from "../components/Nav"
 export default function FAQ() {
   return (
     <>
-      <section className="mt-16 px-4 py-8 md:px-8 md:py-12">
+      <section className="mt-3 px-4 py-8 md:px-8 md:py-6">
         <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl shadow-2xl overflow-hidden">
           <div className="p-8 md:p-12 text-white">
             <div className="text-center mb-12">
-              <h2 className="font-playfair font-bold text-3xl md:text-4xl lg:text-5xl mb-6">
+              <h2 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl mb-6">
                 Protect Your Digital Identity with DigiPrints
               </h2>
               <p className="font-sans text-lg mb-8 max-w-2xl mx-auto">
@@ -16,7 +16,7 @@ export default function FAQ() {
             </div>
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="md:w-1/2 text-left">
-                <h3 className="font-sans font-bold text-xl md:text-2xl lg:text-3xl mb-4">
+                <h3 className="font-heading font-bold text-xl md:text-2xl lg:text-3xl mb-4">
                   What is DigiPrints?
                 </h3>
                 <p className="font-sans text-lg mb-6">
@@ -35,7 +35,7 @@ export default function FAQ() {
           </div>
 
           <div className="bg-white p-8 md:p-12">
-            <h3 className="font-sans text-purple-800 font-bold text-2xl mb-6 text-center">
+            <h3 className="font-heading text-purple-800 font-bold text-2xl mb-6 text-center">
               With DigiPrints you can:
             </h3>
             <ul className="list-disc list-inside text-purple-800 space-y-4 max-w-2xl mx-auto">
@@ -50,7 +50,7 @@ export default function FAQ() {
           </div>
 
           <div className="bg-gradient-to-br from-purple-600 to-indigo-700 p-8 md:p-12 text-white">
-            <h3 className="font-sans text-white font-bold text-2xl mb-6 text-center">
+            <h3 className="font-heading text-white font-bold text-2xl mb-6 text-center">
               Why should I use DigiPrints?
             </h3>
             <p className="font-sans text-lg mb-6 max-w-2xl mx-auto">
@@ -62,7 +62,7 @@ export default function FAQ() {
           </div>
 
           <div className="bg-gradient-to-br from-indigo-100 to-purple-200 p-8 md:p-12">
-            <h3 className="font-sans text-purple-800 font-bold text-2xl mb-6 text-center">
+            <h3 className="font-heading text-purple-800 font-bold text-2xl mb-6 text-center">
               What is my "digital footprint"?
             </h3>
             <p className="font-sans text-purple-700 text-lg mb-6 max-w-2xl mx-auto">

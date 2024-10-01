@@ -1,7 +1,6 @@
 import React from 'react';
-import { Home, Search, Bell, Settings } from 'lucide-react';
+import { Home , Globe } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-
 
 const handleGoogleLogin = () => {
   window.location.href = 'http://localhost:8000/auth/google';
@@ -25,13 +24,18 @@ const Nav = ({ isAuthenticated, onLogout }) => {
 
   const navItems = [
     { id: 'home', icon: Home, link: '/home' },
-
   ];
 
+  // Left links excluding 'Emails'
   const leftLinks = [
     { id: 'transparency', name: 'Transparency', link: '/transparency' },
     { id: 'faqs', name: 'FAQs', link: '/faqs' },
   ];
+
+  // Conditionally add 'Emails' only if authenticated
+  if (isAuthenticated) {
+    leftLinks.push({ id: 'emails', name: 'Access', link: '/emails' },{id:'alias',name:"Posthumous",link:'/alias'},{id: 'extensions',name:"Extensions",link:'/extensions' });
+  }
 
   return (
     <nav className="bg-white/80 backdrop-blur-md py-4 px-6 fixed top-0 left-0 right-0 z-10">
@@ -42,7 +46,7 @@ const Nav = ({ isAuthenticated, onLogout }) => {
         </Link>
 
         {/* Centered left links */}
-        <div className="hidden sm:flex space-x-6 ">
+        <div className="hidden sm:flex space-x-6">
           {leftLinks.map((link) => (
             <Link
               key={link.id}
@@ -78,7 +82,7 @@ const Nav = ({ isAuthenticated, onLogout }) => {
           ) : (
             <button
               onClick={handleGoogleLogin}
-              className="bg-purple-700  hover:bg-indigo-500  text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
+              className="bg-purple-700 hover:bg-indigo-500 text-white font-medium rounded-full px-5 py-2 transition-all duration-300 shadow-lg"
             >
               Login with Google
             </button>

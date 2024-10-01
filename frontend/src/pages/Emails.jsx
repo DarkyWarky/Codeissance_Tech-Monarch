@@ -3,6 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/config';
 import { doc, setDoc } from 'firebase/firestore';
+import { TailSpin } from 'react-loader-spinner';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';  // Importing recharts components
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#FFBB28', '#FF8042']; // Colors for the pie chart
+
+
 
 const LeakResultDisplay = ({ email, leakResult }) => {
     if (!leakResult) return <p>No leak check result available.</p>;
@@ -49,6 +54,7 @@ const LeakResultDisplay = ({ email, leakResult }) => {
 
 const Emails = () => {
     const [emailCategories, setEmailCategories] = useState(null);
+    const [spamCategories, setSpamCategories] = useState(null); // New state for spam emails
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -126,6 +132,37 @@ const Emails = () => {
             setError('Failed to fetch or process emails: ' + err.message);
         }
     };
+    
+    const fetchAndProcessSpamEmails = async (accessToken) => {
+        try {
+            const response = await axios.get('http://localhost:8000/api/gmail/fetch-spams', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                },
+                withCredentials: true
+            });
+            
+            const spamEmails = response.data;
+            console.log('Fetched spam emails:', spamEmails);
+
+            if (spamEmails.length > 0) {
+                const categorizedSpams = await categorizeEmailsWithGemini(spamEmails);
+                setSpamCategories(categorizedSpams);
+            } else {
+                setSpamCategories({
+                    categories: [{
+                        name: "No Spam Emails",
+                        uniqueSenders: 0,
+                        senders: []
+                    }]
+                });
+            }
+        } catch (err) {
+            console.error('Error fetching or processing spam emails:', err);
+            setError('Failed to fetch or process spam emails: ' + err.message);
+        }
+    };
+
 
     const categorizeEmailsWithGemini = async (emails) => {
         const API_KEY = 'AIzaSyApiAFWpRgc7wCo2XCXOD29f2Y0zwjxSx8'; // Replace with your actual API key
@@ -236,8 +273,64 @@ const Emails = () => {
         setSelectedCategory(null);
     };
 
-    if (loading) return <div className="text-center mt-8">Loading...</div>;
-    if (error) return <div className="text-center mt-8 text-red-600">Error: {error}</div>;
+    const renderPieChart = () => {
+        if (!emailCategories || !emailCategories.categories) return null;
+
+        // Prepare data for the PieChart
+        const pieData = emailCategories.categories.map((category) => ({
+            name: category.name,
+            value: category.senders.reduce((sum, sender) => sum + sender.count, 0),
+        }));
+
+        return (
+            <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                    <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        fill="#8884d8"
+                        label
+                    >
+                        {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                </PieChart>
+            </ResponsiveContainer>
+        );
+    };
+
+
+    if (loading) return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-indigo-700 text-white relative">
+            {/* Loader */}
+            <TailSpin
+                height="120"
+                width="120"
+                color="#fff"
+                ariaLabel="tail-spin-loading"
+                radius="1"
+                wrapperStyle={{}}
+                visible={true}
+            />
+            
+            {/* Loading Text */}
+            <p className="text-3xl font-bold mt-6 animate-pulse">Finding Your Digital Footprints...</p>
+    
+            {/* Floating decorative elements */}
+            <div className="absolute top-10 left-10 bg-white w-8 h-8 rounded-full opacity-50 animate-float"></div>
+            <div className="absolute bottom-16 right-16 bg-indigo-200 w-10 h-10 rounded-full opacity-50 animate-float delay-100"></div>
+            <div className="absolute top-24 right-24 bg-purple-300 w-12 h-12 rounded-full opacity-50 animate-float delay-200"></div>
+        </div>
+    );
+    
+        if (error) return <div className="text-center mt-8 text-red-600">Error: {error}</div>;
 
     return (
             <>
@@ -245,6 +338,12 @@ const Emails = () => {
             <h1 className="text-6xl font-heading font-bold leading-tight pt-9 text-white mb-6 text-center">Companies that have Footprints</h1>
             {userProfile && <p className="text-center text-white/90 mb-4">User: {userProfile.email}</p>}
             
+            {/* Render the Pie Chart */}
+            <div className="my-8">
+                    {renderPieChart()}
+                </div>
+
+
             {emailCategories && emailCategories.categories.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {emailCategories.categories.map((category, index) => (
@@ -288,6 +387,33 @@ const Emails = () => {
                 </div>
             )}
             
+            {spamCategories && (
+                <div className="w-full max-w-4xl mb-10">
+                    <h2 className="text-3xl font-heading leading-tight font-semibold mb-6 text-center text-gray-800">
+                        Spam Emails
+                    </h2>
+                    {renderPieChart(spamCategories)}
+
+                    {spamCategories.categories.map((category, index) => (
+                        <div key={index} className="mb-4">
+                            <div
+                                className="text-2xl font-medium cursor-pointer hover:text-blue-500 mb-2"
+                                onClick={() => handleCategoryClick(category)}
+                            >
+                                {category.name} - {category.uniqueSenders} unique senders
+                            </div>
+                            <ul>
+                                {category.senders.map((sender, i) => (
+                                    <li key={i} className="pl-4">
+                                        {sender.name} - {sender.count} emails
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {/* Updated leak check result display */}
         </div>
                 <LeakResultDisplay email={userProfile?.email} leakResult={leakResult} />
