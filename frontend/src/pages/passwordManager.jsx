@@ -264,7 +264,7 @@ const PasswordManager = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">Password Manager</h1>
+      <h1 className="text-5xl font-heading font-bold mb-8 text-center text-purple-600">Password Manager</h1>
       {isAuthenticated ? (
         profile ? (
           <div className="space-y-8">
