@@ -16,44 +16,58 @@ const PasswordManager = () => {
   const [showQRCode, setShowQRCode] = useState(false);
 
   const fetchPasswordsFromServer = useCallback(async (googleId) => {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/user/password-data', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Raw password data from server:', data);
-        
-        // Ensure data is in the correct format
-        const formattedData = {};
-        if (Array.isArray(data)) {
-          data.forEach(item => {
-            if (item.domain && item.password) {
-              formattedData[item.domain] = item.password;
-            }
-          });
-        } else if (typeof data === 'object') {
-          Object.entries(data).forEach(([key, value]) => {
-            if (value.domain && value.password) {
-              formattedData[value.domain] = value.password;
-            } else if (typeof value === 'string') {
-              formattedData[key] = value;
-            }
-          });
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/user/password-data', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Raw password data from server:', data);
+          
+          // Ensure data is in the correct format
+          const formattedData = {};
+          if (Array.isArray(data)) {
+            data.forEach(item => {
+              if (item.domain && item.password) {
+                formattedData[item.domain] = item.password;
+              }
+            });
+          } else if (typeof data === 'object') {
+            Object.entries(data).forEach(([key, value]) => {
+              if (value.domain && value.password) {
+                formattedData[value.domain] = value.password;
+              } else if (typeof value === 'string') {
+                formattedData[key] = value;
+              }
+            });
+          }
+          
+          console.log('Formatted password data:', formattedData);
+          
+          // Update the local state with the new password data
+          setPasswordData(formattedData);
+          
+          // Encrypt and store passwords in Firebase
+          encryptAndStorePasswords(googleId, formattedData);
+        } else {
+          console.error('Failed to fetch passwords from server');
         }
-        
-        console.log('Formatted password data:', formattedData);
-        await encryptAndStorePasswords(googleId, formattedData);
-        await fetchPasswordsFromFirestore(googleId);
-      } else {
-        console.error('Failed to fetch passwords from server');
+      } catch (error) {
+        console.error('Error fetching passwords from server:', error);
       }
-    } catch (error) {
-      console.error('Error fetching passwords from server:', error);
-    }
-  }, []);
 
+      // Schedule the next fetch after 60 seconds (1 minute)
+      setTimeout(fetchData, 60000);
+    };
+
+    // Start the initial fetch
+    fetchData();
+
+    // Return a cleanup function to clear the timeout when the component unmounts
+    return () => clearTimeout(fetchData);
+  }, []);
 
   const encryptAndStorePasswords = async (googleId, passwords) => {
     const encryptedPasswords = {};
@@ -67,13 +81,14 @@ const PasswordManager = () => {
       encryptedPasswords[domain] = jwt;
     }
 
-    try {
-      const userRef = doc(db, 'users', googleId);
-      await setDoc(userRef, { passwords: encryptedPasswords }, { merge: true });
-      console.log('Encrypted passwords stored in Firestore:', encryptedPasswords);
-    } catch (error) {
-      console.error('Error storing encrypted passwords in Firestore:', error);
-    }
+      try {
+        const userRef = doc(db, 'users', googleId);
+        await setDoc(userRef, { passwords: encryptedPasswords }, { merge: true });
+        console.log('Encrypted passwords stored in Firestore:', encryptedPasswords);
+      } catch (error) {
+        console.error('Error storing encrypted passwords in Firestore:', error);
+      }
+
   };
 
   const fetchPasswordsFromFirestore = async (googleId) => {
@@ -129,11 +144,17 @@ const PasswordManager = () => {
         console.error('Error fetching profile:', error);
         setProfileError(`Error fetching profile: ${error.message}`);
       }
+
+      // Schedule the next fetch after 5 seconds (5000 milliseconds)
+      setTimeout(fetchProfile, 5000);
     };
 
     if (isAuthenticated) {
       fetchProfile();
     }
+
+    // Cleanup function to clear the timeout when the component unmounts
+    return () => clearTimeout(fetchProfile);
   }, [isAuthenticated, checkAuthStatus, fetchPasswordsFromServer, otpSecret]);
 
   const generateOTPSecret = (googleId) => {
@@ -225,76 +246,105 @@ const PasswordManager = () => {
     }
   };
 
+  const handleHidePassword = (domain) => {
+    setRevealedPasswords(prev => {
+      const newState = { ...prev };
+      delete newState[domain];
+      return newState;
+    });
+  };
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Password Manager</h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">Password Manager</h1>
       {isAuthenticated ? (
         profile ? (
-          <div>
+          <div className="space-y-8">
             {otpSecret && (
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold mb-2">Two-Factor Authentication Setup</h2>
+              <div className="bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-2xl font-semibold mb-4 text-gray-700">Two-Factor Authentication Setup</h2>
                 <button
                   onClick={() => setShowQRCode(!showQRCode)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded mb-2"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full transition duration-300 ease-in-out"
                 >
                   {showQRCode ? 'Hide' : 'Show'} QR Code
                 </button>
                 {showQRCode && (
-                  <div className="mt-2">
+                  <div className="mt-4 flex justify-center">
                     <QRCodeSVG value={`otpauth://totp/PasswordManager:${profile.fullUser.googleId}?secret=${otpSecret}&issuer=PasswordManager`} />
                   </div>
                 )}
               </div>
             )}
             {Object.keys(passwordData).length > 0 ? (
-              <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                <h2 className="text-2xl font-semibold mb-4">Stored Passwords</h2>
-                {Object.entries(passwordData).map(([domain, encryptedPassword]) => (
-                  <div key={domain} className="mb-4">
-                    <p className="mb-2"><strong>Domain:</strong> {domain}</p>
-                    <p className="mb-2">
-                      <strong>Password:</strong> 
-                      {revealedPasswords[domain] || '********'}
-                    </p>
-                    {!revealedPasswords[domain] && (
-                      <button
-                        onClick={() => handleRevealPassword(domain)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                      >
-                        Reveal Password
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <div>
+              <div className="bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-2xl font-semibold mb-6 text-gray-700">Stored Passwords</h2>
+                <div className="space-y-6">
+                  {Object.entries(passwordData).map(([domain, encryptedPassword]) => (
+                    <div key={domain} className="border-b pb-4 last:border-b-0">
+                      <p className="text-lg font-medium text-gray-800 mb-2">{domain}</p>
+                      <p className="mb-3">
+                        <span className="font-semibold">Password:</span> 
+                        <span className="ml-2 font-mono">{revealedPasswords[domain] || '••••••••'}</span>
+                      </p>
+                      {revealedPasswords[domain] ? (
+                        <button
+                          onClick={() => handleHidePassword(domain)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm transition duration-300 ease-in-out mr-2"
+                        >
+                          Hide Password
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleRevealPassword(domain)}
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm transition duration-300 ease-in-out mr-2"
+                        >
+                          Reveal Password
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6">
                   <input
                     type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="Enter OTP"
-                    className="mb-2 px-3 py-2 border rounded"
+                    className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
             ) : (
-              <p>No passwords stored. Generate a password using the extension first.</p>
+              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
+                <p className="font-medium">No passwords stored. Generate a password using the extension first.</p>
+              </div>
             )}
           </div>
         ) : profileError ? (
-          <p className="text-red-500">{profileError}</p>
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg">
+            <p className="font-medium">{profileError}</p>
+          </div>
         ) : (
-          <p>Loading profile...</p>
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
         )
       ) : (
-        <p className="text-lg">Please log in to use the password manager.</p>
+        <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg">
+          <p className="text-lg font-medium">Please log in to use the password manager.</p>
+        </div>
       )}
     </div>
   );
-};
+}
 
 export default PasswordManager;
