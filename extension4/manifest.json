@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "Valid Password Generator",
+    "version": "1.0",
+    "description": "Generates valid passwords based on the current website and sends them to a specified API endpoint.",
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "permissions": [
+      "activeTab",
+      "storage",
+      "tabs"
+    ],
+    "host_permissions": [
+      "http://127.0.0.1:8000/*",
+      "http://localhost:5173/*"
+    ]
+}
