@@ -10,6 +10,7 @@ import Extensions from './pages/Extensions';
 // Import the Alias component
 import AliasManagement from './pages/Alias';
 import PasswordManager from './pages/passwordManager'; // Import the PasswordManager component
+import User_info from './pages/User_info'; // Import the User_info component
 import useAuth from './hooks/useAuth';
 
 function ProtectedRoute({ children }) {
@@ -79,6 +80,15 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <PasswordManager />
+              </ProtectedRoute>
+            } 
+          />
+          {/* Add the new protected route for User_info */}
+          <Route 
+            path="/user-info" 
+            element={
+              <ProtectedRoute>
+                <User_info />
               </ProtectedRoute>
             } 
           />

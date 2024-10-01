@@ -115,59 +115,61 @@ function AliasManagement() {
   };
 
   if (!isAuthenticated) {
-    return <div>Please log in to view and manage aliases.</div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-violet-600 to-indigo-700">
+        <div className="text-white text-2xl font-semibold p-8 bg-white bg-opacity-20 rounded-lg shadow-lg">
+          Please log in to view and manage aliases.
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-br from-violet-600 to-indigo-700 min-h-screen">
-      <h2 className="text-4xl font-heading font-bold  mb-6 text-center text-white">All Users</h2>
-      <ul className="space-y-4">
-        {allUsers.map((userData) => (
-          <li key={userData.id} className="mb-4 p-6 border bg-gradient-to-br from-purple-100 to-indigo-200 rounded-lg shadow-md text-indigo-900 hover:from-purple-200 hover:to-indigo-300 transition-all duration-300">
-            <p className="font-semibold"><strong>User ID:</strong> {userData.id}</p>
-            <p><strong>Email:</strong> {userData.email || 'N/A'}</p>
-            <p><strong>Username:</strong> {userData.username || 'N/A'}</p>
-            <p><strong>Alias:</strong> {userData.alias || 'None'}</p>
-            <p><strong>Responders:</strong></p>
-            <ul className="ml-4 text-indigo-800">
-              {userData.responders && userData.responders.map((responder, index) => (
-                <li key={index} className="mb-1">{responder}</li>
-              ))}
-            </ul>
-            {userData.credentialRequest && (
-              <p><strong>Credential Request:</strong> {userData.credentialRequest.status}</p>
-            )}
-            <div className="mt-4 space-x-2">
-              {userData.email && userData.id !== currentUserProfile?.fullUser.googleId && (
-                <button
-                  onClick={() => addUserAsAlias(userData.id, userData.email)}
-                  className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
-                  Add as Alias
-                </button>
-              )}
-              {userData.responders && userData.responders.includes(currentUserProfile?.fullUser.email) && !userData.credentialRequest && (
-                <button
-                  onClick={() => requestCredentials(userData.id)}
-                  className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
-                  Request Credentials
-                </button>
-)}
-{userData.credentialRequest && userData.credentialRequest.status === 'pending' && (
-  <button
-    onClick={() => rejectCredentialRequest(userData.id)}
-    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-  >
-    Reject Credential Request
-  </button>
-)}
-</div>
-</li>
-))}
-</ul>
-</div>
-);
+    <div className="min-h-screen bg-gradient-to-br from-violet-600 to-indigo-700 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-4xl font-extrabold text-center text-white mb-12">Alias Management</h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {allUsers.map((userData) => (
+            <div key={userData.id} className="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500 hover:scale-105">
+              <div className="px-6 py-4 bg-indigo-100">
+                <div className="font-bold text-xl mb-2 text-indigo-800">{userData.username || 'N/A'}</div>
+                <p className="text-gray-600 mb-4">{userData.email || 'N/A'}</p>
+                <p className="text-gray-600 mb-4">{userData.alias || 'None'}</p>
+                <p className="text-gray-600 mb-4">{userData.responders && userData.responders.join(', ') || 'N/A'}</p>
+                <p className="text-gray-600 mb-4">{userData.credentialRequest && userData.credentialRequest.status || 'N/A'}</p>
+                <div className="mt-4 space-x-2">
+                  {userData.email && userData.id !== currentUserProfile?.fullUser.googleId && (
+                    <button
+                      onClick={() => addUserAsAlias(userData.id, userData.email)}
+                      className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                    >
+                      Add as Alias
+                    </button>
+                  )}
+                  {userData.responders && userData.responders.includes(currentUserProfile?.fullUser.email) && !userData.credentialRequest && (
+                    <button
+                      onClick={() => requestCredentials(userData.id)}
+                      className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                    >
+                      Request Credentials
+                    </button>
+                  )}
+                  {userData.credentialRequest && userData.credentialRequest.status === 'pending' && (
+                    <button
+                      onClick={() => rejectCredentialRequest(userData.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                    >
+                      Reject Credential Request
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default AliasManagement;

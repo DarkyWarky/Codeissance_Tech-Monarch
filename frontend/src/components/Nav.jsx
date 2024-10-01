@@ -34,7 +34,7 @@ const Nav = ({ isAuthenticated, onLogout }) => {
 
   // Conditionally add 'Emails' only if authenticated
   if (isAuthenticated) {
-    leftLinks.push({ id: 'emails', name: 'Access', link: '/emails' },{id:'alias',name:"Posthumous",link:'/alias'},{id: 'extensions',name:"Extensions",link:'/extensions' },{id:'passwords',name:"Password Manager",link:'/password-manager'});
+    leftLinks.push({ id: 'emails', name: 'Access', link: '/emails' },{id:'alias',name:"Posthumous",link:'/alias'},{id: 'extensions',name:"Extensions",link:'/extensions' },{id:'passwords',name:"Password Manager",link:'/password-manager'},{id:'user-info',name:"User Info",link:'/user-info'});
   }
 
   return (
